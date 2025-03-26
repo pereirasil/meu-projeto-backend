@@ -1,8 +1,20 @@
 import { Injectable } from '@nestjs/common';
-const express = require('express');
-const http = require('http');
-const socketIo = require('socket.io');
-const cors = require('cors');
+import * as express from 'express';
+import * as http from 'http';
+import * as socketIo from 'socket.io';
+import * as cors from 'cors';
+
+interface UserMap {
+  [socketId: string]: string;
+}
+
+interface VoteMap {
+  [socketId: string]: number;
+}
+
+interface SelectionMap {
+  [socketId: string]: any; // Replace `any` with a specific type if known
+}
 
 @Injectable()
 export class AppService {
@@ -13,39 +25,38 @@ export class AppService {
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server, {
+const io = new socketIo.Server(server, {
   cors: {
-    origin: process.env.CORS_ORIGIN || '*', // Definir origem em variáveis de ambiente para produção
-    methods: ['GET', 'POST']
-  }
+    origin: process.env.CORS_ORIGIN || '*',
+    methods: ['GET', 'POST'],
+  },
 });
 
-let users = {}; // Mapeia socket.id -> username
-let votes = {}; // Mapeia socket.id -> voto
-let selections = {}; // Mapeia socket.id -> seleção de carta e cor
+let users: UserMap = {};
+let votes: VoteMap = {};
+let selections: SelectionMap = {};
 console.log('Servidor iniciado');
-// Atualiza e emite a lista de usuários para todos os clientes
+
 function updateUsers() {
   const userList = Object.entries(users).map(([socketId, username]) => ({
     socketId,
-    username
+    username,
   }));
   io.emit('updateUsers', userList);
 }
 
-app.use(cors()); // Habilita CORS globalmente
+app.use(cors());
 
-io.on('connection', (socket) => {
+io.on('connection', (socket: socketIo.Socket) => {
   console.log(`Novo usuário conectado: ${socket.id}`);
 
-  socket.onAny((event, data) => {
+  socket.onAny((event: string, data: any) => {
     console.log(`Evento recebido: ${event}`, data);
   });
 
-  // Usuário se junta à sessão
-  socket.on('join', (username) => {
+  socket.on('join', (username: string) => {
     if (!username || typeof username !== 'string' || username.trim() === '') {
-      return; // Evita nomes inválidos
+      return;
     }
 
     users[socket.id] = username.trim();
@@ -53,18 +64,16 @@ io.on('connection', (socket) => {
     updateUsers();
   });
 
-  // Usuário vota
-  socket.on('vote', (voteData) => {
+  socket.on('vote', (voteData: { vote: number }) => {
     if (!users[socket.id] || typeof voteData.vote !== 'number') {
       return;
     }
     votes[socket.id] = voteData.vote;
     console.log(`Voto recebido: ${users[socket.id]} votou em ${voteData.vote}`);
-    io.emit('newVote', { username: users[socket.id], vote: 'X' }); // mantém o voto oculto para os demais
+    io.emit('newVote', { username: users[socket.id], vote: 'X' });
   });
-  
-  // Usuário seleciona uma carta
-  socket.on('selectCard', (selectionData) => {
+
+  socket.on('selectCard', (selectionData: any) => {
     if (!users[socket.id]) {
       return;
     }
@@ -73,24 +82,32 @@ io.on('connection', (socket) => {
     io.emit('cardSelected', selectionData);
   });
 
-  // Revela os votos
   socket.on('revealVotes', () => {
     const revealedVotes = Object.entries(users).map(([socketId, username]) => ({
       username,
-      vote: votes[socketId] ?? '?'
+      vote: votes[socketId] ?? '?',
     }));
-    
-    const voteValues = Object.values(votes).map(Number).filter(v => !isNaN(v));
-    const averageVote = voteValues.length > 0
-      ? (voteValues.reduce((a, b) => a + b, 0) / voteValues.length).toFixed(2)
-      : '0.00';
 
-    console.log('Votos revelados:', revealedVotes); // Adiciona o console.log para exibir os votos
+    const voteValues = Object.values(votes).map(Number).filter((v) => !isNaN(v));
+    const averageVote =
+      voteValues.length > 0
+        ? (voteValues.reduce((a, b) => a + b, 0) / voteValues.length).toFixed(2)
+        : '0.00';
+
+    console.log('Votos revelados:', revealedVotes);
 
     io.emit('showVotes', { revealedVotes, averageVote });
   });
 
-  // Usuário se desconecta
+  // Handle user logout
+  socket.on('leave', (username: string) => {
+    console.log(`Usuário saiu: ${username} (ID: ${socket.id})`);
+    delete users[socket.id];
+    delete votes[socket.id];
+    delete selections[socket.id];
+    updateUsers();
+  });
+
   socket.on('disconnect', () => {
     console.log(`Usuário desconectado: ${socket.id}`);
     delete users[socket.id];
@@ -100,8 +117,7 @@ io.on('connection', (socket) => {
   });
 });
 
-// Configuração da porta e do IP
-const PORT = process.env.PORT || 3000;
+const PORT = parseInt(process.env.PORT || '3001', 10); // Convert PORT to a number
 const HOST = '0.0.0.0';
 
 server.listen(PORT, HOST, () => {
