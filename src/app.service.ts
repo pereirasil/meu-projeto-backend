@@ -30,11 +30,19 @@ export class AppService {
     this.io = new socketIo.Server(this.server, {
       cors: {
         origin: process.env.CORS_ORIGIN || '*',
-        methods: ['GET', 'POST'],
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        credentials: true,
       },
+      pingTimeout: 60000,
+      pingInterval: 25000,
     });
 
-    this.app.use(cors());
+    this.app.use(cors({
+      origin: process.env.CORS_ORIGIN || '*',
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      credentials: true,
+    }));
+    
     this.setupWebSocket();
     this.startServer();
   }
@@ -197,11 +205,13 @@ export class AppService {
   }
 
   private startServer() {
-    const PORT = parseInt(process.env.PORT || '3001', 10);
-    const HOST = '192.168.0.127';
+    const PORT = parseInt(process.env.PORT || '3002', 10);
+    const HOST = '0.0.0.0';
 
     this.server.listen(PORT, HOST, () => {
       console.log(`Servidor rodando em http://${HOST}:${PORT}`);
+      console.log(`Ambiente: ${process.env.NODE_ENV || 'development'}`);
+      console.log(`CORS origin: ${process.env.CORS_ORIGIN || '*'}`);
     });
   }
 }
