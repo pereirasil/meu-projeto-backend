@@ -205,7 +205,7 @@ export class AppService {
   }
 
   private startServer() {
-    const PORT = parseInt(process.env.PORT || '4001', 10);
+    const PORT = parseInt(process.env.PORT || '5001', 10);
     const HOST = '0.0.0.0';
 
     this.server.listen(PORT, HOST, () => {
