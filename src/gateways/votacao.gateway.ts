@@ -6,6 +6,7 @@ import {
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { Logger } from '@nestjs/common';
 
 interface User {
   id: string;
@@ -24,26 +25,32 @@ interface Room {
 
 @WebSocketGateway({
   cors: {
-    origin: ['http://localhost:5002', 'http://192.168.0.127:5002'],
+    origin: process.env.NODE_ENV === 'production'
+      ? ['https://app.timeboard.site', 'http://191.252.177.174:5002']
+      : ['http://localhost:5002', 'http://192.168.0.127:5002'],
     credentials: true,
   },
+  transports: ['polling', 'websocket'],
+  path: '/socket.io/',
   pingTimeout: 60000,
   pingInterval: 25000,
-  transports: ['polling', 'websocket'],
-  path: '/socket.io/'
+  connectTimeout: 45000,
+  allowUpgrades: true,
+  cookie: false
 })
 export class VotacaoGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
-  private rooms: Map<string, Room> = new Map();
+  private logger = new Logger('VotacaoGateway');
+  private rooms: Map<string, any> = new Map();
 
   handleConnection(client: Socket) {
-    console.log(`Cliente conectado: ${client.id}`);
+    this.logger.log(`Cliente conectado: ${client.id}`);
   }
 
   handleDisconnect(client: Socket) {
-    console.log(`Cliente desconectado: ${client.id}`);
+    this.logger.log(`Cliente desconectado: ${client.id}`);
     // Remover usuário de todas as salas
     this.rooms.forEach((room, roomId) => {
       const userIndex = room.users.findIndex(user => user.id === client.id);
