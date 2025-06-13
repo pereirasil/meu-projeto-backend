@@ -24,12 +24,13 @@ interface Room {
 
 @WebSocketGateway({
   cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: ['http://localhost:5002', 'http://192.168.0.127:5002'],
     credentials: true,
   },
   pingTimeout: 60000,
   pingInterval: 25000,
-  transports: ['websocket'],
+  transports: ['polling', 'websocket'],
+  path: '/socket.io/'
 })
 export class VotacaoGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
