@@ -14,22 +14,15 @@ async function bootstrap() {
   
   // Define allowed origins based on environment
   const corsOrigins = nodeEnv === 'production' 
-    ? ['https://app.timeboard.site', 'http://191.252.177.174:5002']
+    ? ['https://timeboard.site', 'https://app.timeboard.site', 'http://191.252.177.174:5002']
     : ['http://localhost:5002', 'http://192.168.0.127:5002'];
 
-  // Log server configuration
-  logger.log(`Server Configuration:
-    - Host: ${host}
-    - Port: ${port}
-    - CORS Origins: ${corsOrigins.join(', ')}
-    - Environment: ${nodeEnv}
-  `);
-  
   // Configuração do CORS
   app.enableCors({
     origin: corsOrigins,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
   });
 
   // Configuração do WebSocket
