@@ -25,9 +25,9 @@ interface Room {
 
 @WebSocketGateway({
   cors: {
-    origin: process.env.NODE_ENV === 'production'
-      ? ['https://app.timeboard.site', 'http://191.252.177.174:5002']
-      : ['http://localhost:5002', 'http://192.168.0.127:5002'],
+    origin: (origin, callback) => {
+      callback(null, origin);
+    },
     credentials: true,
   },
   transports: ['polling', 'websocket'],
