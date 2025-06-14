@@ -12,14 +12,9 @@ async function bootstrap() {
   const host = process.env.HOST || '0.0.0.0';
   const nodeEnv = process.env.NODE_ENV || 'development';
   
-  // Define allowed origins based on environment
-  const corsOrigins = nodeEnv === 'production' 
-    ? ['https://timeboard.site', 'https://app.timeboard.site', 'http://191.252.177.174:5002']
-    : ['http://localhost:5002', 'http://192.168.0.127:5002'];
-
   // Configuração do CORS
   app.enableCors({
-    origin: corsOrigins,
+    origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
