@@ -14,12 +14,10 @@ async function bootstrap() {
   
   // Configuração do CORS
   app.enableCors({
-    origin: (origin, callback) => {
-      callback(null, origin);
-    },
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    origin: process.env.CORS_ORIGIN || 'https://timeboard.site',
     credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
   });
 
   // Configuração do WebSocket

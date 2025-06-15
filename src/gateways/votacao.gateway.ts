@@ -25,9 +25,7 @@ interface Room {
 
 @WebSocketGateway({
   cors: {
-    origin: (origin, callback) => {
-      callback(null, origin);
-    },
+    origin: process.env.CORS_ORIGIN || 'https://timeboard.site',
     credentials: true,
   },
   transports: ['polling', 'websocket'],
