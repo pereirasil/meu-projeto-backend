@@ -15,12 +15,21 @@ interface User {
   role?: string;
 }
 
+interface ChatMessage {
+  id: string;
+  userId: string;
+  userName: string;
+  message: string;
+  timestamp: Date;
+}
+
 interface Room {
   id: string;
   name: string;
   users: User[];
   votes: Record<string, number>;
   isRevealed: boolean;
+  messages: ChatMessage[];
 }
 
 @WebSocketGateway({
@@ -72,7 +81,8 @@ export class VotacaoGateway implements OnGatewayConnection, OnGatewayDisconnect 
         role: 'moderator'
       }],
       votes: {},
-      isRevealed: false
+      isRevealed: false,
+      messages: []
     };
 
     this.rooms.set(roomId, newRoom);
@@ -112,7 +122,8 @@ export class VotacaoGateway implements OnGatewayConnection, OnGatewayDisconnect 
     this.server.to(data.roomId).emit('userJoined', {
       users: room.users,
       isRevealed: room.isRevealed,
-      votes: room.isRevealed ? room.votes : undefined
+      votes: room.isRevealed ? room.votes : undefined,
+      messages: room.messages
     });
 
     return { success: true };
@@ -180,5 +191,42 @@ export class VotacaoGateway implements OnGatewayConnection, OnGatewayDisconnect 
       room.votes = {};
       this.server.to(roomId).emit('votingReset');
     }
+  }
+
+  @SubscribeMessage('chatMessage')
+  handleChatMessage(client: Socket, data: { roomId: string; message: string }) {
+    const room = this.rooms.get(data.roomId);
+    if (!room) {
+      client.emit('error', { message: 'Sala não encontrada' });
+      return;
+    }
+
+    const user = room.users.find(u => u.id === client.id);
+    if (!user) {
+      client.emit('error', { message: 'Usuário não encontrado na sala' });
+      return;
+    }
+
+    const newMessage: ChatMessage = {
+      id: Math.random().toString(36).substring(2, 15),
+      userId: client.id,
+      userName: user.name,
+      message: data.message,
+      timestamp: new Date()
+    };
+
+    // Adiciona a mensagem ao histórico da sala
+    room.messages.push(newMessage);
+
+    // Limita o histórico a 100 mensagens para não sobrecarregar a memória
+    if (room.messages.length > 100) {
+      room.messages = room.messages.slice(-100);
+    }
+
+    // Envia a mensagem para todos na sala
+    this.server.to(data.roomId).emit('newChatMessage', newMessage);
+
+    this.logger.log(`Nova mensagem em ${room.name} de ${user.name}: ${data.message}`);
+    return { success: true };
   }
 } 
