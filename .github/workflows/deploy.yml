@@ -31,6 +31,10 @@ jobs:
               npm install -g pm2
             fi
             
+            # Copy production environment file
+            echo "Setting up production environment..."
+            cp env-production-mysql.txt .env
+            
             # Verify environment variables for GitHub OAuth
             echo "Checking GitHub OAuth configuration..."
             if [ -z "$GITHUB_CLIENT_ID" ] || [ -z "$GITHUB_CLIENT_SECRET" ]; then
@@ -39,6 +43,7 @@ jobs:
             else
               echo "GitHub OAuth environment variables are configured"
             fi
+            
             # Build the application for production
             yarn build
             
@@ -47,7 +52,15 @@ jobs:
             if [ $? -eq 0 ]; then
               pm2 restart votacao-backend
             else
-              pm2 start dist/main.js --name "votacao-backend"
+              pm2 start dist/main.js --name "votacao-backend" --env production
             fi
+            
             # Save PM2 process list
-            pm2 save 
+            pm2 save
+            
+            # Show PM2 status
+            pm2 status
+            
+            # Show application logs
+            echo "Application logs:"
+            pm2 logs votacao-backend --lines 10 
