@@ -58,3 +58,4 @@ npm run start:dev
 
 A integração GitHub está pronta para funcionar com o Client ID correto! 🚀
 
+

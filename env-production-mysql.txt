@@ -1,0 +1,25 @@
+# Configurações do Servidor
+PORT=5001
+HOST=0.0.0.0
+
+# Ambiente
+NODE_ENV=production
+
+# Configurações do Socket.IO
+SOCKET_PATH=/socket.io/
+SOCKET_TRANSPORTS=polling,websocket
+
+# Database Configuration - MySQL
+DB_HOST=192.185.212.7
+DB_PORT=3306
+DB_USERNAME=gogoto38_timeboard
+DB_PASSWORD=MZE36vkT@#
+DB_DATABASE=gogoto38_timeboard
+
+# JWT Configuration
+JWT_SECRET=your-super-secret-jwt-key-change-this-in-production-2024
+JWT_EXPIRES_IN=7d
+
+# GitHub OAuth Configuration
+GITHUB_CLIENT_ID=Ov23lizvhhJM3ueDoymL
+GITHUB_CLIENT_SECRET=81cdef78ba4592c5bb11836997c92163c8305005

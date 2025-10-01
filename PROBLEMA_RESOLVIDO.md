@@ -76,3 +76,4 @@ A integração GitHub está pronta para funcionar com as credenciais corretas! �
 3. Atualizar a callback URL no GitHub para `http://localhost:3003/github/callback`
 4. Reiniciar o backend após essas alterações
 
+

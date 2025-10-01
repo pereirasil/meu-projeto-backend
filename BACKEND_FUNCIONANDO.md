@@ -76,3 +76,4 @@ A integração GitHub está **100% pronta** para funcionar! 🚀
 
 Só falta você configurar o Client Secret real e atualizar a callback URL no GitHub.
 
+
