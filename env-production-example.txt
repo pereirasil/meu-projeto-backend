@@ -1,0 +1,31 @@
+# Configurações para Produção
+# Copie este arquivo para .env.production e ajuste os valores
+
+# Backend URL
+REACT_APP_BACKEND_URL=https://api.seudominio.com
+
+# GitHub OAuth (obtenha em github.com/settings/applications)
+GITHUB_CLIENT_ID=seu_client_id_de_producao
+GITHUB_CLIENT_SECRET=seu_client_secret_de_producao
+
+# JWT Secret (use uma chave forte e única)
+JWT_SECRET=sua_chave_jwt_secreta_forte_de_producao
+
+# Database URL (PostgreSQL de produção)
+DATABASE_URL=postgresql://usuario:senha@host:porta/database
+
+# Node Environment
+NODE_ENV=production
+
+# Porta do servidor (opcional)
+PORT=3003
+
+# CORS Origins (domínios permitidos)
+CORS_ORIGINS=https://seudominio.com,https://www.seudominio.com
+
+# Log Level
+LOG_LEVEL=info
+
+# Rate Limiting
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100

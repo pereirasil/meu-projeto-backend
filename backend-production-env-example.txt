@@ -1,0 +1,29 @@
+# Configurações de Produção - Backend
+# ===================================
+
+# Ambiente
+NODE_ENV=production
+
+# Banco de Dados (exemplo - mantenha suas configurações atuais)
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+DATABASE_USERNAME=seu_usuario
+DATABASE_PASSWORD=sua_senha
+DATABASE_NAME=seu_banco
+
+# JWT (exemplo - mantenha suas configurações atuais)
+JWT_SECRET=seu_jwt_secret_atual
+JWT_EXPIRES_IN=7d
+
+# GitHub OAuth - NOVAS VARIÁVEIS PARA ADICIONAR
+GITHUB_CLIENT_ID=Ov23lizvhhJM3ueDoymL
+GITHUB_CLIENT_SECRET=81cdef78ba4592c5bb11836997c92163c8305005
+
+# Porta do servidor
+PORT=3003
+
+# CORS (exemplo - mantenha suas configurações atuais)
+CORS_ORIGIN=https://app.timeboard.site,https://timeboard.site
+
+# Outras configurações existentes...
+# (mantenha todas as outras variáveis que já estavam funcionando)
