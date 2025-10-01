@@ -12,9 +12,9 @@ SOCKET_TRANSPORTS=polling,websocket
 # Database Configuration - MySQL
 DB_HOST=192.185.212.7
 DB_PORT=3306
-DB_USERNAME=gogoto38_timeboard
-DB_PASSWORD=MZE36vkT@#
-DB_DATABASE=gogoto38_timeboard
+DB_USERNAME=gogoto38_votacao
+DB_PASSWORD=MZE36vkT
+DB_DATABASE=gogoto38_votacao
 
 # JWT Configuration
 JWT_SECRET=your-super-secret-jwt-key-change-this-in-production-2024
