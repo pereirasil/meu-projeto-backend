@@ -4,9 +4,14 @@ import {
   SubscribeMessage,
   OnGatewayConnection,
   OnGatewayDisconnect,
+  MessageBody,
+  ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { VotingService } from '../services/voting.service';
+import { JoinRoomDto, VoteDto, ChatMessageDto, LeaveRoomDto } from '../dto/voting.dto';
 
 interface User {
   id: string;
@@ -30,11 +35,19 @@ interface Room {
   votes: Record<string, number>;
   isRevealed: boolean;
   messages: ChatMessage[];
+  createdAt: Date;
 }
 
 @WebSocketGateway({
   cors: {
-    origin: process.env.CORS_ORIGIN || 'https://timeboard.site',
+    origin: [
+      'http://localhost:3000',
+      'http://localhost:5000', 
+      'http://localhost:5001',
+      'http://192.168.0.127:5000',
+      'https://timeboard.site',
+      'https://app.timeboard.site'
+    ],
     credentials: true,
   },
   transports: ['polling', 'websocket'],
@@ -52,8 +65,56 @@ export class VotacaoGateway implements OnGatewayConnection, OnGatewayDisconnect 
   private logger = new Logger('VotacaoGateway');
   private rooms: Map<string, any> = new Map();
 
-  handleConnection(client: Socket) {
-    this.logger.log(`Cliente conectado: ${client.id}`);
+  constructor(
+    private readonly votingService: VotingService,
+    private readonly jwtService: JwtService
+  ) {}
+
+  async handleConnection(client: Socket) {
+    try {
+      this.logger.log(`Cliente conectado: ${client.id}`);
+      
+      // Verificar autenticação JWT
+      const token = client.handshake.auth?.token || client.handshake.headers?.authorization?.replace('Bearer ', '');
+      
+      if (token) {
+        try {
+          const payload = await this.jwtService.verifyAsync(token);
+          this.logger.log(`Usuário autenticado: ${payload.email} (ID: ${payload.sub})`);
+          
+          // Armazenar informações do usuário no socket
+          client.data.user = {
+            id: payload.sub,
+            email: payload.email,
+            name: payload.name || payload.email
+          };
+          
+          client.emit('connected', { 
+            message: 'Conectado ao servidor de votação',
+            clientId: client.id,
+            user: client.data.user,
+            timestamp: new Date()
+          });
+        } catch (jwtError) {
+          this.logger.warn(`Token JWT inválido para cliente ${client.id}:`, jwtError.message);
+          client.emit('auth_error', { message: 'Token inválido' });
+          client.disconnect();
+          return;
+        }
+      } else {
+        this.logger.warn(`Cliente ${client.id} conectou sem token de autenticação`);
+        // Permitir conexão sem autenticação para compatibilidade com o sistema atual
+        client.emit('connected', { 
+          message: 'Conectado ao servidor de votação (sem autenticação)',
+          clientId: client.id,
+          timestamp: new Date()
+        });
+      }
+    } catch (error) {
+      this.logger.error(`Erro ao processar conexão do cliente ${client.id}:`, error);
+      client.emit('error', { message: 'Erro interno do servidor' });
+      client.disconnect();
+    }
   }
 
   handleDisconnect(client: Socket) {
@@ -70,63 +131,79 @@ export class VotacaoGateway implements OnGatewayConnection, OnGatewayDisconnect 
   }
 
   @SubscribeMessage('createRoom')
-  handleCreateRoom(client: Socket, data: { roomName: string; userName: string }) {
-    const roomId = Math.random().toString(36).substring(2, 8);
-    const newRoom: Room = {
-      id: roomId,
-      name: data.roomName,
-      users: [{
-        id: client.id,
-        name: data.userName,
-        role: 'moderator'
-      }],
-      votes: {},
-      isRevealed: false,
-      messages: []
-    };
+  async handleCreateRoom(@ConnectedSocket() client: Socket, @MessageBody() data: { roomName: string; userName: string }) {
+    try {
+      // Criar sala usando o serviço (requer autenticação JWT)
+      // Por enquanto, vamos manter a lógica original para compatibilidade
+      const roomId = Math.random().toString(36).substring(2, 8);
+      const newRoom: Room = {
+        id: roomId,
+        name: data.roomName,
+        users: [{
+          id: client.id,
+          name: data.userName,
+          role: 'moderator'
+        }],
+        votes: {},
+        isRevealed: false,
+        messages: [],
+        createdAt: new Date()
+      };
 
-    this.rooms.set(roomId, newRoom);
-    client.join(roomId);
-    client.emit('roomCreated', { roomId });
-    return { roomId };
+      this.rooms.set(roomId, newRoom);
+      client.join(roomId);
+      client.emit('roomCreated', { roomId });
+      return { roomId };
+    } catch (error) {
+      this.logger.error('Error creating room:', error);
+      client.emit('error', { message: 'Failed to create room' });
+    }
   }
 
   @SubscribeMessage('joinRoom')
-  handleJoinRoom(client: Socket, data: { roomId: string; userName: string; userRole?: string; avatar?: string }) {
-    const room = this.rooms.get(data.roomId);
-    if (!room) {
-      client.emit('error', { message: 'Sala não encontrada' });
-      return;
+  async handleJoinRoom(@ConnectedSocket() client: Socket, @MessageBody() data: JoinRoomDto) {
+    try {
+      const room = this.rooms.get(data.roomId);
+      if (!room) {
+        client.emit('error', { message: 'Sala não encontrada' });
+        return;
+      }
+
+      // Verifica se o usuário já existe na sala
+      const existingUser = room.users.find(user => user.id === client.id);
+      if (existingUser) {
+        // Se o usuário já existe, apenas atualiza as informações
+        existingUser.name = data.userName;
+        existingUser.role = data.userRole || existingUser.role;
+        existingUser.avatar = data.avatar || existingUser.avatar;
+      } else {
+        // Se o usuário não existe, adiciona como novo
+        const newUser: User = {
+          id: client.id,
+          name: data.userName,
+          role: data.userRole || 'participant',
+          avatar: data.avatar
+        };
+        room.users.push(newUser);
+      }
+
+      client.join(data.roomId);
+
+      this.server.to(data.roomId).emit('userJoined', {
+        users: room.users,
+        isRevealed: room.isRevealed,
+        votes: room.isRevealed ? room.votes : undefined,
+        messages: room.messages
+      });
+
+      // Enviar histórico de chat para o usuário que acabou de entrar
+      client.emit('chatHistory', room.messages);
+
+      return { success: true };
+    } catch (error) {
+      this.logger.error('Error joining room:', error);
+      client.emit('error', { message: 'Failed to join room' });
     }
-
-    // Verifica se o usuário já existe na sala
-    const existingUser = room.users.find(user => user.id === client.id);
-    if (existingUser) {
-      // Se o usuário já existe, apenas atualiza as informações
-      existingUser.name = data.userName;
-      existingUser.role = data.userRole || existingUser.role;
-      existingUser.avatar = data.avatar || existingUser.avatar;
-    } else {
-      // Se o usuário não existe, adiciona como novo
-      const newUser: User = {
-        id: client.id,
-        name: data.userName,
-        role: data.userRole || 'participant',
-        avatar: data.avatar
-      };
-      room.users.push(newUser);
-    }
-
-    client.join(data.roomId);
-
-    this.server.to(data.roomId).emit('userJoined', {
-      users: room.users,
-      isRevealed: room.isRevealed,
-      votes: room.isRevealed ? room.votes : undefined,
-      messages: room.messages
-    });
-
-    return { success: true };
   }
 
   @SubscribeMessage('leaveRoom')
@@ -191,6 +268,20 @@ export class VotacaoGateway implements OnGatewayConnection, OnGatewayDisconnect 
       room.votes = {};
       this.server.to(roomId).emit('votingReset');
     }
+  }
+
+  @SubscribeMessage('activeRooms')
+  handleActiveRooms(client: Socket) {
+    const activeRooms = Array.from(this.rooms.values()).map(room => ({
+      id: room.id,
+      name: room.name,
+      participants: room.users.length,
+      isRevealed: room.isRevealed,
+      createdAt: room.createdAt || new Date()
+    }));
+
+    client.emit('activeRooms', activeRooms);
+    return { rooms: activeRooms };
   }
 
   @SubscribeMessage('chatMessage')

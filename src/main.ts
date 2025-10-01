@@ -10,7 +10,7 @@ class CustomIoAdapter extends IoAdapter {
     const server = super.createIOServer(port, {
       ...options,
       cors: {
-        origin: ['http://localhost:5000', 'http://192.168.0.127:5000', 'https://timeboard.site', 'https://app.timeboard.site'],
+        origin: ['http://localhost:3000', 'http://localhost:5000', 'http://localhost:5001', 'http://192.168.0.127:5000', 'https://timeboard.site', 'https://app.timeboard.site'],
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
         credentials: true,
       },
@@ -32,7 +32,7 @@ async function bootstrap() {
   // Configuração do CORS
   const allowedOrigins = nodeEnv === 'production'
     ? ['https://timeboard.site', 'https://app.timeboard.site']
-    : ['http://localhost:5000', 'http://192.168.0.127:5000'];
+    : ['http://localhost:3000', 'http://localhost:5000', 'http://localhost:5001', 'http://192.168.0.127:5000'];
 
   app.enableCors({
     origin: allowedOrigins,

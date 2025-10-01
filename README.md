@@ -21,78 +21,248 @@
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
+# Sistema de Gerenciamento de Tarefas - Trello Clone
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Um sistema completo de gerenciamento de tarefas estilo Trello, construído com NestJS, TypeScript e PostgreSQL.
 
-## Project setup
+## 🚀 Funcionalidades Principais
 
-```bash
-$ yarn install
+### Boards (Quadros)
+- ✅ Criar, editar e deletar quadros
+- ✅ Configurar visibilidade (público/privado)
+- ✅ Personalizar cores e temas
+- ✅ Sistema de permissões e membros
+
+### Lists (Listas/Colunas)
+- ✅ Criar listas organizacionais
+- ✅ Reordenar listas via drag & drop
+- ✅ Editar títulos e posições
+- ✅ Controle de acesso baseado em permissões
+
+### Cards (Cartões/Tarefas)
+- ✅ Criar tarefas com título e descrição
+- ✅ Definir prazos de entrega
+- ✅ Sistema de prioridades (baixa, média, alta)
+- ✅ Atribuir responsáveis
+- ✅ Mover cards entre listas
+- ✅ Reordenar posições
+
+### Etiquetas e Organização
+- ✅ Etiquetas coloridas personalizáveis
+- ✅ Categorização de tarefas
+- ✅ Filtros por etiquetas
+
+### Checklists
+- ✅ Listas de verificação aninhadas
+- ✅ Marcar itens como concluídos
+- ✅ Reordenar itens
+
+### Comentários e Colaboração
+- ✅ Sistema de comentários nos cards
+- ✅ Histórico de discussões
+- ✅ Identificação de usuários
+
+### Usuários e Permissões
+- ✅ Sistema de autenticação JWT
+- ✅ Registro e login de usuários
+- ✅ Perfis personalizáveis
+- ✅ Controle de acesso granular
+- ✅ Múltiplos níveis de permissão (owner, admin, member)
+
+### Drag & Drop
+- ✅ Arrastar e soltar cards entre listas
+- ✅ Reordenar listas nos quadros
+- ✅ Reordenar cards dentro das listas
+- ✅ Atualizações em tempo real
+
+## 🛠️ Tecnologias Utilizadas
+
+### Backend
+- **NestJS** - Framework Node.js para aplicações escaláveis
+- **TypeScript** - Linguagem tipada para JavaScript
+- **TypeORM** - ORM para banco de dados
+- **PostgreSQL** - Banco de dados relacional
+- **JWT** - Autenticação stateless
+- **Passport** - Estratégias de autenticação
+- **bcryptjs** - Hash de senhas seguro
+- **Socket.io** - Comunicação em tempo real
+
+### Validação e Segurança
+- **class-validator** - Validação de DTOs
+- **class-transformer** - Transformação de dados
+- **CORS** - Cross-Origin Resource Sharing configurado
+
+## 📁 Estrutura do Projeto
+
+```
+src/
+├── entities/           # Entidades TypeORM
+│   ├── user.entity.ts
+│   ├── board.entity.ts
+│   ├── list.entity.ts
+│   ├── card.entity.ts
+│   ├── label.entity.ts
+│   ├── checklist.entity.ts
+│   ├── checklist-item.entity.ts
+│   ├── comment.entity.ts
+│   └── board-member.entity.ts
+├── dto/               # Data Transfer Objects
+│   ├── auth.dto.ts
+│   ├── board.dto.ts
+│   ├── list.dto.ts
+│   └── card.dto.ts
+├── services/          # Lógica de negócio
+│   ├── auth.service.ts
+│   ├── board.service.ts
+│   ├── list.service.ts
+│   └── card.service.ts
+├── controllers/       # Controladores da API
+│   ├── auth.controller.ts
+│   └── board.controller.ts
+├── guards/           # Guards de autenticação
+│   └── jwt-auth.guard.ts
+├── strategies/       # Estratégias de autenticação
+│   └── jwt.strategy.ts
+├── modules/          # Módulos da aplicação
+│   ├── auth.module.ts
+│   └── board.module.ts
+└── main.ts           # Ponto de entrada
 ```
 
-## Compile and run the project
+## 🗄️ Banco de Dados
 
+### Tabelas Principais
+- `users` - Usuários do sistema
+- `boards` - Quadros de tarefas
+- `lists` - Listas/colunas dos quadros
+- `cards` - Cartões/tarefas das listas
+- `labels` - Etiquetas coloridas
+- `checklists` - Listas de verificação
+- `checklist_items` - Itens das checklists
+- `comments` - Comentários dos cards
+- `board_members` - Membros dos quadros
+
+### Relacionamentos
+- Usuários podem ter múltiplos quadros
+- Quadros contêm múltiplas listas
+- Listas contêm múltiplos cards
+- Cards podem ter múltiplas etiquetas
+- Cards podem ter múltiplas checklists
+- Cards podem ter múltiplos comentários
+- Sistema de permissões por quadro
+
+## 🚀 Instalação e Configuração
+
+### Pré-requisitos
+- Node.js 18+
+- PostgreSQL 12+
+- Yarn ou npm
+
+### 1. Clone o repositório
 ```bash
-# development
-$ yarn run start
-
-# watch mode
-$ yarn run start:dev
-
-# production mode
-$ yarn run start:prod
+git clone <repository-url>
+cd meu-projeto-backend
 ```
 
-## Run tests
-
+### 2. Instale as dependências
 ```bash
-# unit tests
-$ yarn run test
-
-# e2e tests
-$ yarn run test:e2e
-
-# test coverage
-$ yarn run test:cov
+yarn install
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
+### 3. Configure o banco de dados
 ```bash
-$ yarn install -g mau
-$ mau deploy
+# Crie um banco PostgreSQL chamado 'trello_db'
+createdb trello_db
+
+# Configure as variáveis de ambiente
+cp .env.example .env
+# Edite o arquivo .env com suas configurações
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### 4. Execute as migrações
+```bash
+# O TypeORM irá sincronizar automaticamente em desenvolvimento
+yarn start:dev
+```
 
-## Resources
+### 5. Inicie a aplicação
+```bash
+# Desenvolvimento
+yarn start:dev
 
-Check out a few resources that may come in handy when working with NestJS:
+# Produção
+yarn build
+yarn start:prod
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+## 📚 API Endpoints
 
-## Support
+### Autenticação
+- `POST /auth/register` - Registrar usuário
+- `POST /auth/login` - Login
+- `GET /auth/profile` - Perfil do usuário
+- `PUT /auth/profile` - Atualizar perfil
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### Quadros
+- `POST /boards` - Criar quadro
+- `GET /boards` - Listar quadros do usuário
+- `GET /boards/:id` - Obter quadro específico
+- `PUT /boards/:id` - Atualizar quadro
+- `DELETE /boards/:id` - Deletar quadro
 
-## Stay in touch
+### Membros dos Quadros
+- `POST /boards/:id/members` - Adicionar membro
+- `PUT /boards/:id/members/:memberId` - Atualizar permissões
+- `DELETE /boards/:id/members/:memberId` - Remover membro
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## 🔐 Autenticação
 
-## License
+O sistema utiliza JWT (JSON Web Tokens) para autenticação:
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+1. **Registro**: Usuário cria conta com email e senha
+2. **Login**: Usuário recebe token JWT válido por 7 dias
+3. **Proteção**: Endpoints protegidos requerem token no header `Authorization: Bearer <token>`
+4. **Validação**: Token é validado em cada requisição
+
+## 🎯 Próximos Passos
+
+### Funcionalidades Planejadas
+- [ ] Sistema de notificações
+- [ ] Histórico de atividades
+- [ ] Templates de quadros
+- [ ] Exportação de dados
+- [ ] Integração com calendário
+- [ ] Sistema de busca avançada
+- [ ] Relatórios e analytics
+- [ ] Integração com serviços externos
+
+### Melhorias Técnicas
+- [ ] Cache Redis para performance
+- [ ] Testes automatizados
+- [ ] CI/CD pipeline
+- [ ] Monitoramento e logs
+- [ ] Rate limiting
+- [ ] Documentação OpenAPI/Swagger
+
+## 🤝 Contribuição
+
+1. Fork o projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
+
+## 📄 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
+
+## 🆘 Suporte
+
+Para suporte e dúvidas:
+- Abra uma issue no GitHub
+- Consulte a documentação do NestJS
+- Entre em contato com a equipe de desenvolvimento
+
+---
+
+**Desenvolvido com ❤️ usando NestJS e TypeScript**

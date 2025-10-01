@@ -25,16 +25,29 @@ jobs:
             git pull origin main
             # Install Node.js dependencies
             yarn install --frozen-lockfile
+            
             # Check if pm2 is installed globally, if not install it
             if ! command -v pm2 &> /dev/null; then
               npm install -g pm2
             fi
+            
+            # Verify environment variables for GitHub OAuth
+            echo "Checking GitHub OAuth configuration..."
+            if [ -z "$GITHUB_CLIENT_ID" ] || [ -z "$GITHUB_CLIENT_SECRET" ]; then
+              echo "WARNING: GitHub OAuth environment variables not set!"
+              echo "Please configure GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET in your server environment"
+            else
+              echo "GitHub OAuth environment variables are configured"
+            fi
+            # Build the application for production
+            yarn build
+            
             # Restart or start the application
             pm2 describe votacao-backend > /dev/null
             if [ $? -eq 0 ]; then
               pm2 restart votacao-backend
             else
-              pm2 start yarn --name "votacao-backend" -- start
+              pm2 start dist/main.js --name "votacao-backend"
             fi
             # Save PM2 process list
             pm2 save 

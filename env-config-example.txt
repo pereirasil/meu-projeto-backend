@@ -1,0 +1,30 @@
+# GitHub OAuth Configuration - EXEMPLO
+# Copie este arquivo para .env e configure com suas credenciais reais
+
+# Database Configuration
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+DATABASE_USERNAME=postgres
+DATABASE_PASSWORD=password
+DATABASE_NAME=votacao_db
+
+# JWT Configuration
+JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+JWT_EXPIRES_IN=24h
+
+# GitHub OAuth Configuration
+# IMPORTANTE: Configure com suas credenciais reais do GitHub OAuth App
+GITHUB_CLIENT_ID=Ov23lizvhhJM3ueDoymL
+GITHUB_CLIENT_SECRET=your-github-client-secret-here
+
+# Server Configuration
+PORT=3003
+NODE_ENV=development
+
+# CORS Configuration
+CORS_ORIGIN=http://localhost:5000
+
+# INSTRUÇÕES:
+# 1. Copie este arquivo para .env
+# 2. Configure GITHUB_CLIENT_SECRET com o secret real do GitHub
+# 3. Reinicie o backend: npm run start:dev
