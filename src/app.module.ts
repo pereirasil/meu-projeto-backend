@@ -53,7 +53,7 @@ import { VotingMessage } from './entities/voting-message.entity';
         VotingVote,
         VotingMessage,
       ],
-      synchronize: process.env.NODE_ENV !== 'production', // Sincronizar apenas em desenvolvimento
+      synchronize: false, // Desabilitado para evitar conflitos
       logging: process.env.NODE_ENV !== 'production',
     }),
     AuthModule,

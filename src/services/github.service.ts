@@ -29,10 +29,11 @@ export class GitHubService {
     
     this.logger.log(`🔧 GitHub OAuth configurado - Client ID: ${this.clientId}`);
     
-    if (!this.clientId || this.clientId === 'Ov23lizvhhJM3ueDoymL') {
+    // Verificar se as credenciais são válidas (não são valores padrão de exemplo)
+    if (!this.clientId || this.clientId === 'your-github-client-id' || this.clientId === 'example-client-id') {
       this.logger.warn('⚠️  GITHUB_CLIENT_ID não configurado! Use as credenciais reais da sua OAuth App.');
     }
-    if (!this.clientSecret || this.clientSecret === '81cdef78ba4592c5bb11836997c92163c8305005') {
+    if (!this.clientSecret || this.clientSecret === 'your-github-client-secret' || this.clientSecret === 'example-client-secret') {
       this.logger.warn('⚠️  GITHUB_CLIENT_SECRET não configurado! Use as credenciais reais da sua OAuth App.');
     }
   }

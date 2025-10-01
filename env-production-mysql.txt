@@ -1,5 +1,5 @@
 # Configurações do Servidor
-PORT=5001
+PORT=3003
 HOST=0.0.0.0
 
 # Ambiente
@@ -17,7 +17,7 @@ DB_PASSWORD=MZE36vkT
 DB_DATABASE=gogoto38_votacao
 
 # JWT Configuration
-JWT_SECRET=your-super-secret-jwt-key-change-this-in-production-2024
+JWT_SECRET=19954c0e2f985a135946b133458fccc84ba467a9262408d9f9e9ced5404882177d7e2b946a7f68d339334a05b2da6083da7b929d210d444e403b38bda27e3264
 JWT_EXPIRES_IN=7d
 
 # GitHub OAuth Configuration
