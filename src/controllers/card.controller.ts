@@ -10,13 +10,13 @@ export class CardController {
 
   @Get()
   async getCardsByList(@Request() req, @Param('listId') listId: string) {
-    return this.cardService.getCardsByList(parseInt(listId), req.user.userId);
+    return this.cardService.getCardsByList(parseInt(listId), req.user.sub);
   }
 
   @Post()
   async createCard(@Request() req, @Param('listId') listId: string, @Body() createCardDto: CreateCardDto) {
     const cardData = { ...createCardDto, list_id: parseInt(listId) };
-    return this.cardService.createCard(req.user.userId, cardData);
+    return this.cardService.createCard(req.user.sub, cardData);
   }
 
   @Get(':cardId')
@@ -31,12 +31,12 @@ export class CardController {
     @Param('cardId') cardId: string,
     @Body() updateCardDto: UpdateCardDto
   ) {
-    return this.cardService.updateCard(parseInt(cardId), req.user.userId, updateCardDto);
+    return this.cardService.updateCard(parseInt(cardId), req.user.sub, updateCardDto);
   }
 
   @Delete(':cardId')
   async deleteCard(@Request() req, @Param('listId') listId: string, @Param('cardId') cardId: string) {
-    return this.cardService.deleteCard(parseInt(cardId), req.user.userId);
+    return this.cardService.deleteCard(parseInt(cardId), req.user.sub);
   }
 
   @Put(':cardId/move')
@@ -46,7 +46,7 @@ export class CardController {
     @Param('cardId') cardId: string,
     @Body() moveCardDto: MoveCardDto
   ) {
-    return this.cardService.moveCard(parseInt(cardId), req.user.userId, moveCardDto);
+    return this.cardService.moveCard(parseInt(cardId), req.user.sub, moveCardDto);
   }
 
   @Put(':cardId/assign')
@@ -56,6 +56,6 @@ export class CardController {
     @Param('cardId') cardId: string,
     @Body() assignCardDto: AssignCardDto
   ) {
-    return this.cardService.assignCard(parseInt(cardId), req.user.userId, assignCardDto);
+    return this.cardService.assignCard(parseInt(cardId), req.user.sub, assignCardDto);
   }
 }

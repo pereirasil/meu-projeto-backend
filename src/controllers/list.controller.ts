@@ -10,13 +10,13 @@ export class ListController {
 
   @Get()
   async getListsByBoard(@Request() req, @Param('boardId') boardId: string) {
-    return this.listService.getListsByBoard(parseInt(boardId), req.user.userId);
+    return this.listService.getListsByBoard(parseInt(boardId), req.user.sub);
   }
 
   @Post()
   async createList(@Request() req, @Param('boardId') boardId: string, @Body() createListDto: CreateListDto) {
     const listData = { ...createListDto, board_id: parseInt(boardId) };
-    return this.listService.createList(req.user.userId, listData);
+    return this.listService.createList(req.user.sub, listData);
   }
 
   @Put(':listId')
@@ -26,12 +26,12 @@ export class ListController {
     @Param('listId') listId: string,
     @Body() updateListDto: UpdateListDto
   ) {
-    return this.listService.updateList(parseInt(listId), req.user.userId, updateListDto);
+    return this.listService.updateList(parseInt(listId), req.user.sub, updateListDto);
   }
 
   @Delete(':listId')
   async deleteList(@Request() req, @Param('boardId') boardId: string, @Param('listId') listId: string) {
-    return this.listService.deleteList(parseInt(listId), req.user.userId);
+    return this.listService.deleteList(parseInt(listId), req.user.sub);
   }
 
   @Put(':listId/move')
@@ -41,6 +41,6 @@ export class ListController {
     @Param('listId') listId: string,
     @Body() moveListDto: MoveListDto
   ) {
-    return this.listService.moveList(parseInt(listId), req.user.userId, moveListDto);
+    return this.listService.moveList(parseInt(listId), req.user.sub, moveListDto);
   }
 }

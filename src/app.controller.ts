@@ -105,4 +105,37 @@ export class AppController {
   createItem(@Body() createItemDto: CreateItemDto): string {
     return `Produto cadastrado com sucesso: ${createItemDto.name}`;
   }
+
+  @Get('debug/sprint-tables')
+  async debugSprintTables() {
+    try {
+      // Este endpoint será implementado para verificar as tabelas
+      return {
+        message: 'Endpoint de debug das tabelas de sprint',
+        status: 'implementando...'
+      };
+    } catch (error) {
+      return {
+        message: 'Erro ao verificar tabelas',
+        error: error.message
+      };
+    }
+  }
+
+  @Post('debug/test-sprint-task')
+  async testSprintTask(@Body() body: any) {
+    try {
+      // Simular a criação de uma tarefa de sprint
+      return {
+        message: 'Teste de criação de tarefa de sprint',
+        data: body,
+        status: 'sucesso'
+      };
+    } catch (error) {
+      return {
+        message: 'Erro no teste',
+        error: error.message
+      };
+    }
+  }
 }
